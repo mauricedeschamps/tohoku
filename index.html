@@ -77,7 +77,7 @@
       flex-wrap: wrap;
     }
 
-    button, .lang-btn, .clickable-item {
+    button, .lang-btn {
       background-color: var(--card);
       border: 1px solid var(--border);
       color: var(--text);
@@ -88,7 +88,7 @@
       transition: 0.2s;
     }
 
-    button:hover, .lang-btn:hover, .clickable-item:hover {
+    button:hover, .lang-btn:hover {
       background-color: var(--primary);
       color: white;
       border-color: var(--primary);
@@ -238,10 +238,10 @@
 
   <main class="container" id="main-content"></main>
 
-  <!-- Google Map (下部・フッターの上) -->
+  <!-- Google Map（仙台駅周辺: 38.2323508, 141.1050829） -->
   <div class="container map-wrapper">
     <iframe 
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1f819134.9169954015!2d139.5!3d38.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5f8a2969758f6e89%3A0x12f5f4caf20fea5!2z5bSO5p2x5Zyw5Yy65bSO5p2x5biC!5e0!3m2!1sja!2sjp!4v1712842000000!5m2!1sja!2sjp" 
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10439.525006177684!2d141.1023157!3d38.2323508!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5f8a2969758f6e89%3A0x12f5f4caf20fea5!2z5a6u5Zyw6aeF!5e0!3m2!1sja!2sjp!4v1712842000000!5m2!1sja!2sjp" 
       allowfullscreen loading="lazy" 
       referrerpolicy="no-referrer-when-downgrade">
     </iframe>
@@ -313,6 +313,14 @@
         officialLink: "公式ページ",
         closeDetail: "← 県詳細に戻る"
       }
+    };
+
+    // 国旗マッピング
+    const flagIcons = {
+      en: "🇬🇧",
+      it: "🇮🇹",
+      ru: "🇷🇺",
+      ja: "🇯🇵"
     };
 
     // ---------- 全6県の完全データ ----------
@@ -459,6 +467,20 @@
       const titleElem = document.getElementById("app-title");
       if (titleElem) titleElem.innerText = translations[lang].appTitle;
       renderCurrentView();
+      // 言語ボタンのアクティブスタイル更新
+      updateLangButtonsActive();
+    }
+
+    // 言語ボタンのアクティブスタイル
+    function updateLangButtonsActive() {
+      document.querySelectorAll(".lang-btn").forEach(btn => {
+        const lang = btn.getAttribute("data-lang");
+        if (lang === currentLang) {
+          btn.style.border = "2px solid var(--primary)";
+        } else {
+          btn.style.border = "1px solid var(--border)";
+        }
+      });
     }
 
     // メインレンダリング
@@ -508,7 +530,7 @@
       });
     }
 
-    // 県詳細（観光地・祭り・温泉・アクセスのリスト）
+    // 県詳細（観光地・祭り・温泉・アクセスのリスト） - スポンサーは上下のみ
     function renderPrefDetail() {
       const pref = prefectureData[currentPrefId];
       if (!pref) {
@@ -520,10 +542,13 @@
       const prefName = pref.name[currentLang] || pref.name.en;
       
       let html = `
+        <div class="sponsor">
+          <p>✨ ${t.sponsorMsg}</p>
+          <small>${t.sponsorNote}</small>
+        </div>
         <div class="detail-card">
           <img src="${pref.imgPlaceholder}" alt="${escapeHtml(prefName)}" class="detail-image">
           <h2>${escapeHtml(prefName)}</h2>
-          <div class="sponsor"><small>${t.sponsorMsg}</small></div>
       `;
       
       // 観光地
@@ -536,7 +561,6 @@
       } else {
         html += `<div class="list-item">No data</div>`;
       }
-      html += `<div class="sponsor"><small>${t.sponsorMsg}</small></div>`;
       
       // 祭り
       html += `<h3>🎎 ${t.festivals}</h3>`;
@@ -548,7 +572,6 @@
       } else {
         html += `<div class="list-item">No data</div>`;
       }
-      html += `<div class="sponsor"><small>${t.sponsorMsg}</small></div>`;
       
       // 温泉
       html += `<h3>♨️ ${t.hotsprings}</h3>`;
@@ -560,7 +583,6 @@
       } else {
         html += `<div class="list-item">No data</div>`;
       }
-      html += `<div class="sponsor"><small>${t.sponsorMsg}</small></div>`;
       
       // アクセス
       html += `<h3>🚗 ${t.access}</h3>`;
@@ -572,7 +594,6 @@
       } else {
         html += `<div class="list-item">No data</div>`;
       }
-      html += `<div class="sponsor"><small>${t.sponsorMsg}</small></div>`;
       
       // 公式サイトリンク
       html += `<h3>🔗 ${t.officialSite}</h3>`;
@@ -580,7 +601,8 @@
       
       // 戻るボタン
       html += `<div><button class="back-btn" id="back-home-btn">${t.back}</button></div>`;
-      html += `</div><div class="sponsor"><small>${t.sponsorMsg}</small></div>`;
+      html += `</div>`;
+      html += `<div class="sponsor"><p>✨ ${t.sponsorMsg}</p><small>${t.sponsorNote}</small></div>`;
       
       document.getElementById("main-content").innerHTML = html;
       
@@ -605,7 +627,7 @@
       }
     }
     
-    // 項目詳細（説明＋公式リンク）
+    // 項目詳細 - スポンサー上下のみ
     function renderItemDetail() {
       const pref = prefectureData[currentPrefId];
       if (!pref) {
@@ -626,16 +648,21 @@
       const itemUrl = item.url || "#";
       
       let html = `
+        <div class="sponsor">
+          <p>✨ ${t.sponsorMsg}</p>
+          <small>${t.sponsorNote}</small>
+        </div>
         <div class="detail-card">
           <h2>${escapeHtml(itemName)}</h2>
-          <div class="sponsor"><small>${t.sponsorMsg}</small></div>
           <p><strong>${t.detailInfo}:</strong> ${escapeHtml(itemDesc)}</p>
-          <div class="sponsor"><small>${t.sponsorMsg}</small></div>
           <h3>🔗 ${t.officialLink}</h3>
           <a href="${itemUrl}" target="_blank" rel="noopener" class="official-link">${escapeHtml(itemUrl)}</a>
           <div><button class="back-btn" id="back-to-pref-btn">${t.closeDetail}</button></div>
         </div>
-        <div class="sponsor"><small>${t.sponsorMsg}</small></div>
+        <div class="sponsor">
+          <p>✨ ${t.sponsorMsg}</p>
+          <small>${t.sponsorNote}</small>
+        </div>
       `;
       document.getElementById("main-content").innerHTML = html;
       
@@ -659,7 +686,7 @@
       });
     }
     
-    // 言語ボタン生成
+    // 言語ボタン生成（国旗アイコン付き）
     function buildLangButtons() {
       const langs = ["en", "it", "ru", "ja"];
       const container = document.getElementById("lang-group");
@@ -667,16 +694,18 @@
       container.innerHTML = "";
       langs.forEach(lang => {
         const btn = document.createElement("button");
-        btn.innerText = lang.toUpperCase();
         btn.classList.add("lang-btn");
-        if (currentLang === lang) btn.style.border = "2px solid var(--primary)";
+        btn.setAttribute("data-lang", lang);
+        // 表示テキスト: 国旗 + 言語コード（例: "🇬🇧 EN"）
+        const flag = flagIcons[lang];
+        const label = `${flag} ${lang.toUpperCase()}`;
+        btn.innerText = label;
         btn.addEventListener("click", () => {
           setLanguage(lang);
-          document.querySelectorAll(".lang-btn").forEach(b => b.style.border = "1px solid var(--border)");
-          btn.style.border = "2px solid var(--primary)";
         });
         container.appendChild(btn);
       });
+      updateLangButtonsActive();
     }
     
     // 初期化
