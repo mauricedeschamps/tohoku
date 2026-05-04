@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>An invitation to depth road of north Japan</title>
+  <title>An invitation to Michinoku (the deep north)</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1e1e2f">
   <meta name="description" content="Explore Tohoku's top attractions, festivals, and hot springs. PWA app with maps and multi-language support.">
@@ -111,7 +111,7 @@
       border-radius: 1rem;
       overflow: hidden;
       border: 1px solid var(--border);
-      height: 280px;
+      height: 300px;
     }
 
     iframe {
@@ -227,7 +227,7 @@
   <header class="app-header">
     <div class="container">
       <div class="flex-between">
-        <h1 id="app-title">An invitation to depth road of north Japan</h1>
+        <h1 id="app-title">An invitation to Michinoku (the deep north)</h1>
         <div class="controls">
           <div class="lang-group" id="lang-group"></div>
           <button id="theme-toggle">🌓 Dark/Light</button>
@@ -238,10 +238,10 @@
 
   <main class="container" id="main-content"></main>
 
-  <!-- Google Map（仙台駅周辺: 38.2323508, 141.1050829） -->
+  <!-- Google Map: 東北六県が陸地で収まる範囲（中心 38.5°N, 140.5°E、ズーム7相当） -->
   <div class="container map-wrapper">
     <iframe 
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10439.525006177684!2d141.1023157!3d38.2323508!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5f8a2969758f6e89%3A0x12f5f4caf20fea5!2z5a6u5Zyw6aeF!5e0!3m2!1sja!2sjp!4v1712842000000!5m2!1sja!2sjp" 
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d819134.9169954015!2d139.5!3d38.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5f8a2969758f6e89%3A0x12f5f4caf20fea5!2z5bSO5p2x5Zyw5Yy65bSO5p2x5biC!5e0!3m2!1sja!2sjp!4v1712842000000!5m2!1sja!2sjp" 
       allowfullscreen loading="lazy" 
       referrerpolicy="no-referrer-when-downgrade">
     </iframe>
@@ -255,10 +255,10 @@
   </footer>
 
   <script>
-    // ---------- 多言語データ ----------
+    // ---------- 多言語データ（タイトル修正：英語に Michinoku を明記、他言語は英語から翻訳）----------
     const translations = {
       en: {
-        appTitle: "An invitation to depth road of north Japan",
+        appTitle: "An invitation to Michinoku (the deep north)",
         back: "← Back to prefecture list",
         attractions: "Attractions",
         festivals: "Festivals",
@@ -272,7 +272,7 @@
         closeDetail: "← Back to prefecture details"
       },
       it: {
-        appTitle: "Un invito alla strada profonda del nord del Giappone",
+        appTitle: "Un invito a Michinoku (il profondo nord)",
         back: "← Torna all'elenco delle prefetture",
         attractions: "Attrazioni",
         festivals: "Feste",
@@ -286,7 +286,7 @@
         closeDetail: "← Torna ai dettagli della prefettura"
       },
       ru: {
-        appTitle: "Приглашение в глубинную дорогу северной Японии",
+        appTitle: "Приглашение в Митиноку (глубокий север)",
         back: "← Назад к списку префектур",
         attractions: "Достопримечательности",
         festivals: "Фестивали",
@@ -323,7 +323,7 @@
       ja: "🇯🇵"
     };
 
-    // ---------- 全6県の完全データ ----------
+    // ---------- 全6県の完全データ（変更なし）----------
     const prefectureData = {
       aomori: {
         name: { en: "Aomori", it: "Aomori", ru: "Аомори", ja: "青森県" },
@@ -467,11 +467,9 @@
       const titleElem = document.getElementById("app-title");
       if (titleElem) titleElem.innerText = translations[lang].appTitle;
       renderCurrentView();
-      // 言語ボタンのアクティブスタイル更新
       updateLangButtonsActive();
     }
 
-    // 言語ボタンのアクティブスタイル
     function updateLangButtonsActive() {
       document.querySelectorAll(".lang-btn").forEach(btn => {
         const lang = btn.getAttribute("data-lang");
@@ -483,15 +481,13 @@
       });
     }
 
-    // メインレンダリング
     function renderCurrentView() {
       if (currentView === "home") renderHome();
       else if (currentView === "prefDetail" && currentPrefId) renderPrefDetail();
       else if (currentView === "itemDetail" && currentPrefId && currentCategory && currentItemIndex !== null) renderItemDetail();
-      else renderHome(); // fallback
+      else renderHome();
     }
 
-    // ホーム画面
     function renderHome() {
       const t = translations[currentLang];
       let html = `
@@ -519,9 +515,8 @@
       `;
       document.getElementById("main-content").innerHTML = html;
       
-      // 県カードクリックイベント
       document.querySelectorAll(".pref-card").forEach(card => {
-        card.addEventListener("click", (e) => {
+        card.addEventListener("click", () => {
           currentPrefId = card.getAttribute("data-pref");
           currentView = "prefDetail";
           renderCurrentView();
@@ -530,7 +525,6 @@
       });
     }
 
-    // 県詳細（観光地・祭り・温泉・アクセスのリスト） - スポンサーは上下のみ
     function renderPrefDetail() {
       const pref = prefectureData[currentPrefId];
       if (!pref) {
@@ -551,64 +545,48 @@
           <h2>${escapeHtml(prefName)}</h2>
       `;
       
-      // 観光地
       html += `<h3>📌 ${t.attractions}</h3>`;
       if (pref.attractions && pref.attractions.length) {
         pref.attractions.forEach((item, idx) => {
           const itemName = item.name[currentLang] || item.name.en;
           html += `<div class="list-item" data-cat="attractions" data-idx="${idx}">${escapeHtml(itemName)}</div>`;
         });
-      } else {
-        html += `<div class="list-item">No data</div>`;
-      }
+      } else { html += `<div class="list-item">No data</div>`; }
       
-      // 祭り
       html += `<h3>🎎 ${t.festivals}</h3>`;
       if (pref.festivals && pref.festivals.length) {
         pref.festivals.forEach((item, idx) => {
           const itemName = item.name[currentLang] || item.name.en;
           html += `<div class="list-item" data-cat="festivals" data-idx="${idx}">${escapeHtml(itemName)}</div>`;
         });
-      } else {
-        html += `<div class="list-item">No data</div>`;
-      }
+      } else { html += `<div class="list-item">No data</div>`; }
       
-      // 温泉
       html += `<h3>♨️ ${t.hotsprings}</h3>`;
       if (pref.hotsprings && pref.hotsprings.length) {
         pref.hotsprings.forEach((item, idx) => {
           const itemName = item.name[currentLang] || item.name.en;
           html += `<div class="list-item" data-cat="hotsprings" data-idx="${idx}">${escapeHtml(itemName)}</div>`;
         });
-      } else {
-        html += `<div class="list-item">No data</div>`;
-      }
+      } else { html += `<div class="list-item">No data</div>`; }
       
-      // アクセス
       html += `<h3>🚗 ${t.access}</h3>`;
       if (pref.access && pref.access.length) {
         pref.access.forEach((item, idx) => {
           const itemName = item.name[currentLang] || item.name.en;
           html += `<div class="list-item" data-cat="access" data-idx="${idx}">${escapeHtml(itemName)}</div>`;
         });
-      } else {
-        html += `<div class="list-item">No data</div>`;
-      }
+      } else { html += `<div class="list-item">No data</div>`; }
       
-      // 公式サイトリンク
       html += `<h3>🔗 ${t.officialSite}</h3>`;
       html += `<a href="${pref.officialPrefUrl}" target="_blank" rel="noopener" class="official-link">${escapeHtml(pref.officialPrefUrl)}</a>`;
-      
-      // 戻るボタン
       html += `<div><button class="back-btn" id="back-home-btn">${t.back}</button></div>`;
       html += `</div>`;
       html += `<div class="sponsor"><p>✨ ${t.sponsorMsg}</p><small>${t.sponsorNote}</small></div>`;
       
       document.getElementById("main-content").innerHTML = html;
       
-      // 各リストアイテムにイベント
       document.querySelectorAll(".list-item").forEach(el => {
-        el.addEventListener("click", (e) => {
+        el.addEventListener("click", () => {
           currentCategory = el.getAttribute("data-cat");
           currentItemIndex = parseInt(el.getAttribute("data-idx"));
           currentView = "itemDetail";
@@ -627,14 +605,9 @@
       }
     }
     
-    // 項目詳細 - スポンサー上下のみ
     function renderItemDetail() {
       const pref = prefectureData[currentPrefId];
-      if (!pref) {
-        currentView = "home";
-        renderCurrentView();
-        return;
-      }
+      if (!pref) { currentView = "home"; renderCurrentView(); return; }
       const categoryData = pref[currentCategory];
       if (!categoryData || currentItemIndex < 0 || currentItemIndex >= categoryData.length) {
         currentView = "prefDetail";
@@ -675,7 +648,6 @@
       }
     }
     
-    // XSS対策簡易エスケープ
     function escapeHtml(str) {
       if (!str) return "";
       return str.replace(/[&<>]/g, function(m) {
@@ -686,7 +658,6 @@
       });
     }
     
-    // 言語ボタン生成（国旗アイコン付き）
     function buildLangButtons() {
       const langs = ["en", "it", "ru", "ja"];
       const container = document.getElementById("lang-group");
@@ -696,19 +667,14 @@
         const btn = document.createElement("button");
         btn.classList.add("lang-btn");
         btn.setAttribute("data-lang", lang);
-        // 表示テキスト: 国旗 + 言語コード（例: "🇬🇧 EN"）
         const flag = flagIcons[lang];
-        const label = `${flag} ${lang.toUpperCase()}`;
-        btn.innerText = label;
-        btn.addEventListener("click", () => {
-          setLanguage(lang);
-        });
+        btn.innerText = `${flag} ${lang.toUpperCase()}`;
+        btn.addEventListener("click", () => setLanguage(lang));
         container.appendChild(btn);
       });
       updateLangButtonsActive();
     }
     
-    // 初期化
     window.addEventListener("DOMContentLoaded", () => {
       const savedLang = localStorage.getItem("lang");
       if (savedLang && translations[savedLang]) currentLang = savedLang;
@@ -722,7 +688,6 @@
       const themeToggle = document.getElementById("theme-toggle");
       if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
       
-      // Service Worker登録
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("sw.js").catch(err => console.log("SW registration failed:", err));
       }
